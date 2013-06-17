@@ -8,6 +8,8 @@ Version 1.0.0 beta
 
 Documentation: http://django-cte-trees.readthedocs.com/
 
+Django Package: https://www.djangopackages.com/packages/p/django-cte-trees/
+
 Overview
 ========
 
