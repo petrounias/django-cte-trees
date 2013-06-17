@@ -18,26 +18,25 @@ characteristic for many applications, the currently **known limitations** of
 including CTE (see below) will be a show-stopper for many other applications.
 Unless you know beforehand that these limitations will not affect your
 application, this module is **not suitable** for you, and you should use an
-actively managed tree structure (such as
-`django-mptt <https://github.com/django-mptt/django-mptt/>`_ or
-`django-treebeard <http://code.tabo.pe/django-treebeard/>`_).
+actively managed tree structure (such as django-mptt
+https://github.com/django-mptt/django-mptt/ or django-treebeard
+http://code.tabo.pe/django-treebeard/ ).
 
 
 *Characteristics*
 
 - **Simple**: inheriting from an abstract node model is sufficient to obtain
-  tree functionality for any :class:`Model`.
+  tree functionality for any Model.
 
-- **Seamless**: does not use :class:`RawQuerySet`, so queries using CTE can be
-  combined with normal Django queries, and won't confuse the
-  :class:`SQLCompiler` or other :class:`QuerySets`, including using multiple
-  databases.
+- **Seamless**: does not use RawQuerySet, so queries using CTE can be combined
+  with normal Django queries, and won't confuse the SQLCompiler or other
+  QuerySets, including using multiple databases.
 
 - **Self-contained**: tree nodes can be manipulated without worrying about
   maintaining tree structure in the database.
 
 - **Single query**: all tree traversal operations can be performed through a
-single query, including children, siblings, ancestors, roots, and descendants.
+  single query, including children, siblings, ancestors, roots, and descendants.
 
 - **Flexible ordering**: supports (a subset of) normal Django ordering as well
   as ordering on tree structure information, including depth and path, in DFS
