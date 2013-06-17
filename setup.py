@@ -45,7 +45,7 @@ from setuptools import setup, find_packages
  
 setup(
     name = 'django-cte-trees',
-    version = ":versiontools:cte_tree.VERSION",
+    version = ":versiontools:cte_tree:VERSION",
     packages = find_packages(),
     author = 'Alexis Petrounias <www.petrounias.org>',
     maintainer = 'Alexis Petrounias <www.petrounias.org>',
