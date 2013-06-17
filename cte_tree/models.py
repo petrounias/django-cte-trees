@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011, Alexis Petrounias <www.petrounias.org>.
+# This document is free and open-source software, subject to the OSI-approved
+# BSD license below.
 #
+# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
-# Redistributions of source code must retain the above copyright notice, this
+# * Redistributions of source code must retain the above copyright notice, this
 # list of conditions and the following disclaimer.
 #
-# Redistributions in binary form must reproduce the above copyright notice, this
-# list of conditions and the following disclaimer in the documentation and/or
-# other materials provided with the distribution.
+# * Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
 #
-# Neither the name of the author nor the names of its contributors may be used
+# * Neither the name of the author nor the names of its contributors may be used
 # to endorse or promote products derived from this software without specific
 # prior written permission.
 #
@@ -32,10 +34,10 @@
 """ Django CTE Trees Models.
 """
 
-__status__ = "Prototype"
-__version__ = "0.9.2"
-__maintainer__ = ("Alexis Petrounias <www.petrounias.org>", )
-__author__ = ("Alexis Petrounias <www.petrounias.org>", )
+__status__ = "beta"
+__version__ = "1.0.0b"
+__maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
+__author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
 from django.core.exceptions import ImproperlyConfigured, FieldError
@@ -153,8 +155,10 @@ class CTENodeManager(Manager):
                                 name = field[0]
                             else:
                                 name = field
-                            if self.query.model._meta.get_field_by_name(name)[
-                                0].db_type().startswith('varchar'):
+                            _field = self.query.model._meta.get_field_by_name(
+                                name)[0]
+                            if _field.db_type(self.connection).startswith(
+                                'varchar'):
                                 return 'CAST (T."%s" AS TEXT)' % name
                             else:
                                 return 'T."%s"' % name
@@ -385,20 +389,23 @@ class CTENodeManager(Manager):
                         found = True
             if not found:
                 raise ImproperlyConfigured(
-                    _('CTENode must have a Foreign Key to self for the parent relation.'))
+                    _('CTENode must have a Foreign Key to self for the parent '
+                      'relation.'))
         
         try:
             parent_field = self.model._meta.get_field_by_name(
                 self.model._cte_node_parent)[0]
         except FieldDoesNotExist:
             raise ImproperlyConfigured(''.join([
-                _('CTENode._cte_node_parent must specify a Foreign Key to self, instead it is: '),
+                _('CTENode._cte_node_parent must specify a Foreign Key to self, '
+                  'instead it is: '),
                 self.model._cte_node_parent]))
         
         # Ensure parent relation is a Foreign Key to self.
         if not parent_field.rel.to == self.model:
             raise ImproperlyConfigured(''.join([
-                _('CTENode._cte_node_parent must specify a Foreign Key to self, instead it is: '),
+                _('CTENode._cte_node_parent must specify a Foreign Key to self, '
+                  'instead it is: '),
                 self.model._cte_node_parent]))
         
         # Record the parent field attribute name for future reference.
@@ -450,7 +457,8 @@ class CTENodeManager(Manager):
             self.model._cte_node_ordering]:
             if not hasattr(node, vf):
                 raise FieldError(
-                    _('CTENode objects must be loaded from the database before they can be used.'))
+                    _('CTENode objects must be loaded from the database before '
+                      'they can be used.'))
                     
                                           
     def get_query_set(self):

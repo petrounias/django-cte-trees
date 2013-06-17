@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Custom Fields for use in the Django CTE Trees test application.
+""" Sphinx configuration for Django CTE Trees.
 """
 
 __status__ = "beta"
@@ -40,54 +40,48 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Python
-from uuid import UUID, uuid4
-
-# Django
-from django.db.models import CharField, SubfieldBase
-
-# PsycoPG 2
-from psycopg2.extras import register_uuid
+import sys, os
 
 
-# Register PostgreSQL UUID type.
-register_uuid()
+# add package root as well as dummy Django application so models can be imported
+sys.path.append(os.path.abspath('../..'))
+os.environ['DJANGO_SETTINGS_MODULE'] = 'cte_tree_test.settings'
 
+extensions = ['sphinx.ext.autodoc']
 
-class UUIDField(CharField):
-    
-    # Used so to_python() is called.
-    __metaclass__ = SubfieldBase
+templates_path = ['_templates']
 
+source_suffix = '.rst'
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('default', uuid4)
-        kwargs.setdefault('max_length', 32)
-        kwargs.setdefault('editable', not kwargs.get('primary_key', False))
-        super(UUIDField, self).__init__(*args, **kwargs)
+master_doc = 'index'
 
+project = u'Django CTE Trees'
+copyright = u'2011 Alexis Petrounias <www.petrounias.org>'
 
-    def db_type(self, connection = None):
-        return 'uuid'
+version = '1.0.0'
+release = '1.0.0b1'
 
-    def get_db_prep_value(self, value, connection, prepared = False):
-        if not prepared:
-            return self.to_python(value)
-        return value
-    
-    def to_python(self, value):
-        if not value:
-            return None
-        if not isinstance(value, UUID):
-            value = UUID(value)
-        return value
-    
+pygments_style = 'sphinx'
 
-# South support
-# see http://south.aeracode.org/docs/tutorial/part4.html#simple-inheritance
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:
-    pass
-else:
-    add_introspection_rules([], [r"^cte_tree_test\.fields\.UUIDField", ])
-    
+html_theme = 'default'
+
+html_static_path = ['_static']
+
+htmlhelp_basename = 'DjangoCTETreesdoc'
+
+latex_documents = [
+  ('index', 'DjangoCTETrees.tex', u'Django CTE Trees Documentation',
+   u'Alexis Petrounias \\textless{}www.petrounias.org\\textgreater{}', 'manual'),
+]
+
+man_pages = [
+    ('index', 'djangoctetrees', u'Django CTE Trees Documentation',
+     [u'Alexis Petrounias <www.petrounias.org>'], 1)
+]
+
+texinfo_documents = [
+  ('index', 'DjangoCTETrees', u'Django CTE Trees Documentation',
+   u'Alexis Petrounias <www.petrounias.org>', 'DjangoCTETrees',
+  'Experimental implementation of Adjacency-List trees for Django using PostgreSQL Common Table Expressions (CTE).',
+   'Miscellaneous'),
+]

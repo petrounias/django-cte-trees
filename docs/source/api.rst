@@ -44,20 +44,18 @@ order).
 .. contents::
     :local:
   
-============================================
+=======
 CTENode
-============================================
+=======
 
 .. autoclass:: cte_tree.models.CTENode
-   :show-inheritance:
    :members:
 
 
-============================================
+==============
 CTENodeManager
-============================================
+==============
 
 .. autoclass:: cte_tree.models.CTENodeManager
-   :show-inheritance:
    :members:
 

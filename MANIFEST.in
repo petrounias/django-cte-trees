@@ -1,0 +1,2 @@
+include docs/source/conf.py
+recursive-include docs/source *.rst

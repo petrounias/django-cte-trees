@@ -1,15 +1,11 @@
+.. Django CTE Trees documentation master file
+
+
 Django CTE Trees
 ================
 
 Django Adjacency-List trees using PostgreSQL Common Table Expressions (CTE). Its
 aim is to completely hide the management of tree structure.
-
-Version 1.0.0 beta
-
-Documentation: http://django-cte-trees.readthedocs.com/
-
-Overview
-========
 
 Although handling tree structure in a transparent way is a desirable
 characteristic for many applications, the currently **known limitations** of
@@ -35,7 +31,7 @@ actively managed tree structure (such as
   maintaining tree structure in the database.
 
 - **Single query**: all tree traversal operations can be performed through a
-single query, including children, siblings, ancestors, roots, and descendants.
+  single query, including children, siblings, ancestors, roots, and descendants.
 
 - **Flexible ordering**: supports (a subset of) normal Django ordering as well
   as ordering on tree structure information, including depth and path, in DFS
@@ -67,6 +63,7 @@ single query, including children, siblings, ancestors, roots, and descendants.
   path) or additional normal fields combined with structure fields in descending
   order.
 
+=============
 Prerequisites
 =============
 
@@ -78,6 +75,7 @@ Core:
 - Django >= 1.2
 
 
+=========
 Obtaining
 =========
 
@@ -88,6 +86,7 @@ Obtaining
 - Mercurial repository on BitBucket: http://www.bitbucket.org/petrounias/django-cte-trees/
 
 
+============
 Installation
 ============
 
@@ -110,6 +109,18 @@ INSTALLED_APPS list in your settings::
     )
 
 
+=================
+Table of Contents
+=================
+.. toctree::
+   :maxdepth: 6
+
+   basic.rst
+   examples.rst
+   api.rst
+   technical.rst
+
+=============
 Release Notes
 =============
 
@@ -126,14 +137,14 @@ Release Notes
   pypi data, added documentation, and updated Django multiple database support
   for compatibility with latest version.
 
-
+==================
 Development Status
 ==================
 
 Actively developed and maintained. Currently used in production in proprietary
 projects by the author and his team.
 
-
+===========
 Future Work
 ===========
 
@@ -144,13 +155,13 @@ Future Work
 - Support other databases (which feature CTE in some way) [low priority, normal
   difficulty task].
 
-
+============
 Contributors
 ============
 
 Written and maintained by Alexis Petrounias < http://www.petrounias.org/ >
 
-
+=======
 License
 =======
 
@@ -183,3 +194,12 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+==================
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

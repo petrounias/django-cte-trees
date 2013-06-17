@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Custom Fields for use in the Django CTE Trees test application.
+""" Dummy Django application settings so unittest and Sphinx autodoc can work.
 """
 
 __status__ = "beta"
@@ -39,55 +39,15 @@ __version__ = "1.0.0b"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
-# Python
-from uuid import UUID, uuid4
+SECRET_KEY = 'dummy'
 
-# Django
-from django.db.models import CharField, SubfieldBase
+INSTALLED_APPS = ('cte_tree', 'cte_tree_test', )
 
-# PsycoPG 2
-from psycopg2.extras import register_uuid
-
-
-# Register PostgreSQL UUID type.
-register_uuid()
-
-
-class UUIDField(CharField):
-    
-    # Used so to_python() is called.
-    __metaclass__ = SubfieldBase
-
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('default', uuid4)
-        kwargs.setdefault('max_length', 32)
-        kwargs.setdefault('editable', not kwargs.get('primary_key', False))
-        super(UUIDField, self).__init__(*args, **kwargs)
-
-
-    def db_type(self, connection = None):
-        return 'uuid'
-
-    def get_db_prep_value(self, value, connection, prepared = False):
-        if not prepared:
-            return self.to_python(value)
-        return value
-    
-    def to_python(self, value):
-        if not value:
-            return None
-        if not isinstance(value, UUID):
-            value = UUID(value)
-        return value
-    
-
-# South support
-# see http://south.aeracode.org/docs/tutorial/part4.html#simple-inheritance
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:
-    pass
-else:
-    add_introspection_rules([], [r"^cte_tree_test\.fields\.UUIDField", ])
-    
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dummy',
+        'USER' : 'dummy',
+        'PASSWORD' : 'dummy',
+    }
+}

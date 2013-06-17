@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2011, Alexis Petrounias <www.petrounias.org>.
+# This document is free and open-source software, subject to the OSI-approved
+# BSD license below.
 #
+# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #
-# Redistributions of source code must retain the above copyright notice, this
+# * Redistributions of source code must retain the above copyright notice, this
 # list of conditions and the following disclaimer.
 #
-# Redistributions in binary form must reproduce the above copyright notice, this
-# list of conditions and the following disclaimer in the documentation and/or
-# other materials provided with the distribution.
+# * Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
 #
-# Neither the name of the author nor the names of its contributors may be used
+# * Neither the name of the author nor the names of its contributors may be used
 # to endorse or promote products derived from this software without specific
 # prior written permission.
 #
@@ -32,10 +34,10 @@
 """ Models for the Django CTE Trees test application.
 """
 
-__status__ = "Prototype"
-__version__ = "0.9.2"
-__maintainer__ = ("Alexis Petrounias <www.petrounias.org>", )
-__author__ = ("Alexis Petrounias <www.petrounias.org>", )
+__status__ = "beta"
+__version__ = "1.0.0b"
+__maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
+__author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
 from django.db.models import Model, ForeignKey, CharField, FloatField, \
