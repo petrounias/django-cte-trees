@@ -33,14 +33,14 @@ actively managed tree structure (such as
 - **Single query**: all tree traversal operations can be performed through a
   single query, including children, siblings, ancestors, roots, and descendants.
 
-- **Flexible ordering**: supports (a subset of) normal Django ordering as well
+- **Powerful ordering**: supports (a subset of) normal Django ordering as well
   as ordering on tree structure information, including depth and path, in DFS
   and BFS orders.
 
 - **Multiple delete semantics**: supports Pharaoh, Grandmother, and Monarchy
   deletion patterns.
 
-- **Code**: unit tests, documentation, comments.
+- **Code**: unit tests, code coverage, documentation, comments.
 
 
 *Known limitations*
@@ -116,6 +116,7 @@ Table of Contents
    :maxdepth: 6
 
    basic.rst
+   advanced.rst
    examples.rst
    api.rst
    technical.rst
@@ -137,12 +138,18 @@ Release Notes
   pypi data, added documentation, and updated Django multiple database support
   for compatibility with latest version.
 
+- v1.0.0, 27 July 2013 Beta version 2; several optimisations to reduce compiled
+  query size; fixed an issue with descendants where the offset node was returned
+  as the first descendant; introduced support for CTE table prefixing on virtual
+  fields when used in ordering; introduced support for UPDATE queries; added
+  documentation for ordering, further technical notes, and advanced usage.
+
 ==================
 Development Status
 ==================
 
-Actively developed and maintained. Currently used in production in proprietary
-projects by the author and his team.
+Actively developed and maintained since 2011. Currently used in production in
+proprietary projects by the author and his team, as well as other third parties.
 
 ===========
 Future Work
@@ -167,7 +174,7 @@ License
 
 Released under the OSI-approved BSD license.
 
-Copyright (c) 2013 Alexis Petrounias < www.petrounias.org >,
+Copyright (c) 2011 - 2013 Alexis Petrounias < www.petrounias.org >,
 all rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

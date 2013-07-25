@@ -3,7 +3,7 @@
 # This document is free and open-source software, subject to the OSI-approved
 # BSD license below.
 #
-# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
+# Copyright (c) 2011 - 2013 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 """
 
 __status__ = "beta"
-__version__ = "1.0.0b"
+__version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 

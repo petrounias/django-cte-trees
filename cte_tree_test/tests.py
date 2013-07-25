@@ -3,7 +3,7 @@
 # This document is free and open-source software, subject to the OSI-approved
 # BSD license below.
 #
-# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
+# Copyright (c) 2011 - 2013 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 """
 
 __status__ = "beta"
-__version__ = "1.0.0b"
+__version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
@@ -700,22 +700,22 @@ class SimpleNodeTest(TestCase):
         
         
     def test_node_move(self):
-        
+
         root_node = SimpleNode.objects.create()
         middle_node = SimpleNode.objects.create(parent = root_node)
         bottom_node_1 = SimpleNode.objects.create(parent = middle_node)
         bottom_node_2 = SimpleNode.objects.create(parent = middle_node)
         bottom_node_3 = SimpleNode.objects.create(parent = middle_node)
-        
+
         fresh_bottom_node_3 = SimpleNode.objects.get(id = bottom_node_3.id)
-        
+
         self.assertEqual(fresh_bottom_node_3.depth, 3)
-        
+
         bottom_node_3.move(root_node, position = lambda node, destination: None,
             save = True)
-        
+
         fresh_bottom_node_3 = SimpleNode.objects.get(id = bottom_node_3.id)
-        
+
         self.assertEqual(fresh_bottom_node_3.depth, 2)
         
         

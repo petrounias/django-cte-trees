@@ -3,7 +3,7 @@
 # This document is free and open-source software, subject to the OSI-approved
 # BSD license below.
 #
-# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
+# Copyright (c) 2011 - 2013 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -35,19 +35,18 @@
 """
 
 __status__ = "beta"
-__version__ = "1.0.0b"
+__version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
 from django.core.exceptions import ImproperlyConfigured, FieldError
-from django.db import connections
 from django.db.models import Model, Manager, ForeignKey
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.query import QuerySet
-from django.db.models.sql.query import Query
-from django.db.models.sql.compiler import SQLCompiler
 from django.utils.translation import ugettext as _
+
+# Django CTE Trees
+from query import CTEQuerySet
 
 
 class CTENodeManager(Manager):
@@ -80,214 +79,6 @@ class CTENodeManager(Manager):
         to this manager.
         
     """
-    
-    class CTEQuerySet(QuerySet):
-        
-        class CTEQuery(Query):
-            
-            class CTEQueryCompiler(SQLCompiler):
-                
-                CTE = """WITH RECURSIVE {cte} (
-           "{depth}", "{path}", "{ordering}", "{pk}") AS (
-                
-    SELECT 1 AS depth,
-           array[{pk_path}] AS {path},
-           {order} AS {ordering},
-           T."{pk}"
-     FROM  {db_table} T
-     WHERE T."{parent}" IS NULL
-
-     UNION ALL
-
-    SELECT {cte}.{depth} + 1 AS {depth},
-           {cte}.{path} || {pk_path},
-           {cte}.{ordering} || {order},
-           T."{pk}"
-     FROM  {db_table} T
-     JOIN  {cte} ON T."{parent}" = {cte}."{pk}")
-    
-    """
-    
-                def as_sql(self, *args, **kwargs):
-                    """ Overrides the :class:`SQLCompiler` method in order to
-                        prepend the necessary CTE to the default SQL.
-                    """
-                    # If the Query was cloned in order to implement a statement
-                    # other than SELECT, then we don't modify the SQL at all.
-                    if not self.__class__ == \
-                        CTENodeManager.CTEQuerySet.CTEQuery.CTEQueryCompiler:
-                        return super(self.__class__, self).as_sql(*args,
-                            **kwargs)
-                    
-                    def maybe_alias(table):
-                        if self.query.table_map.has_key(table):
-                            return self.query.table_map[table][0]
-                        return table
-                    
-                    # Add the CTE implicit join, noting any aliasing which may
-                    # have occurred during query construction.
-                    where = ['{cte}."{pk}" = {table}."{pk}"'.format(
-                        cte = self.query.model._cte_node_table,
-                        pk = self.query.model._meta.pk.attname,
-                        table = maybe_alias(self.query.model._meta.db_table))]
-                    self.query.add_extra(
-                        select = None,
-                        select_params = None,
-                        where = where,
-                        params = None,
-                        tables = [self.query.model._cte_node_table],
-                        order_by = None,
-                    )
-
-                    # Obtain compiled SQL from Django.
-                    sql = super(self.__class__, self).as_sql(*args, **kwargs)
-
-                    def maybe_cast(field):
-                        # If the ordering information specified a type to cast
-                        # to, then use this type immediately, otherwise
-                        # determine whether a variable-length character field
-                        # should be cast into TEXT or if no casting is
-                        # necessary. A None type defaults to the latter.
-                        if type(field) == tuple and not field[1] is None:
-                            return 'CAST (T."%s" AS %s)' % field
-                        else:
-                            if type(field) == tuple:
-                                name = field[0]
-                            else:
-                                name = field
-                            _field = self.query.model._meta.get_field_by_name(
-                                name)[0]
-                            if _field.db_type(self.connection).startswith(
-                                'varchar'):
-                                return 'CAST (T."%s" AS TEXT)' % name
-                            else:
-                                return 'T."%s"' % name
-
-                    # The primary key is used in the path; in case it is of a
-                    # custom type, ensure appropriate casting is performed. This
-                    # is a very rare condition, as most types can be used
-                    # directly in the path, especially since no other fields
-                    # with incompatible types are combined (with a notable
-                    # exception of VARCHAR types which must be converted to
-                    # TEXT).
-                    pk_path = maybe_cast((self.query.model._meta.pk.attname,
-                        self.query.model._cte_node_primary_key_type))
-                    
-                    # If no explicit ordering is specified, then use the primary
-                    # key. If the primary key is used in ordering, and it is of
-                    # a type which needs casting in order to be used in the
-                    # ordering, then it is possible that explicit casting was
-                    # not specified through _cte_node_order_by because it is
-                    # expected to be specified through the
-                    # _cte_node_primary_key_type attribute. Specifying the cast
-                    # type of the primary key in the _cte_node_order_by
-                    # attribute has precedence over _cte_node_primary_key_type.
-                    if not hasattr(self.query.model, '_cte_node_order_by') or \
-                        self.query.model._cte_node_order_by is None or \
-                        len(self.query.model._cte_node_order_by) == 0:
-                        order = 'array[%s]' % maybe_cast((
-                            self.query.model._meta.pk.attname,
-                            self.query.model._cte_node_primary_key_type))
-                    else:
-                        # Compute the ordering virtual field constructor,
-                        # possibly casting fields into a common type.
-                        order = '||'.join(['array[%s]' % maybe_cast(field) for \
-                            field in self.query.model._cte_node_order_by])
-                    # Prepend the CTE with the ordering constructor and table
-                    # name to the SQL obtained from Django above.
-                    return (''.join([
-                        self.CTE.format(order = order,
-                            cte = self.query.model._cte_node_table,
-                            depth = self.query.model._cte_node_depth,
-                            path = self.query.model._cte_node_path,
-                            ordering = self.query.model._cte_node_ordering,
-                            parent = self.query.model._cte_node_parent_attname,
-                            pk = self.query.model._meta.pk.attname,
-                            pk_path = pk_path,
-                            db_table = self.query.model._meta.db_table
-                        ), sql[0]]), sql[1])
-
-                
-            def get_compiler(self, using = None, connection = None):
-                """ Overrides the Query method get_compiler in order to return
-                    an instance of the above custom compiler.
-                """
-                # Copy the body of this method from Django except the final
-                # return statement. We will ignore code coverage for this.
-                if using is None and connection is None: #pragma: no cover
-                    raise ValueError("Need either using or connection")
-                if using:
-                    connection = connections[using]
-                # Check that the compiler will be able to execute the query
-                for alias, aggregate in self.aggregate_select.items():
-                    connection.ops.check_aggregate_support(aggregate)
-                # Instantiate the custom compiler.
-                return self.CTEQueryCompiler(self, connection, using)
-
-
-        def __init__(self, model = None, query = None, using = None,
-            offset = None):
-            """ Provides an additional argument offset for use in obtaining the
-                descendants of a node; this argument should contain a valid
-                Node. This QuerySet will return an instance of the above custom
-                Query, which can, however, be used as a normal Query (for
-                instance chaining with other queries).
-            """
-            # Only create an instance of a Query if this is the first invocation
-            # in a query chain.
-            if query is None:
-                query = CTENodeManager.CTEQuerySet.CTEQuery(model)
-                if not model is None:
-                    where = []
-                    # If an offset Node is specified, then only those Nodes
-                    # which contain the offset Node as a parent (in their path
-                    # virtual field) will be returned.
-                    if not offset is None:
-                        where.append("""NOT {cte}."{pk}" = '{id}'""".format(
-                            cte = model._cte_node_table,
-                            pk = model._meta.pk.attname,
-                            id = str(offset.id)))
-                        where.append("""'{id}' = ANY({cte}."{path}")""".format(
-                            cte = model._cte_node_table,
-                            path = model._cte_node_path,
-                            id = str(offset.id)))
-                    order_by_prefix = []
-                    if model._cte_node_traversal == \
-                        CTENodeManager.TREE_TRAVERSAL_NONE:
-                        chosen_traversal = CTENodeManager.DEFAULT_TREE_TRAVERSAL
-                    else:
-                        chosen_traversal = model._cte_node_traversal
-                    if chosen_traversal == CTENodeManager.TREE_TRAVERSAL_DFS:
-                        order_by_prefix = [ model._cte_node_ordering ]
-                    if chosen_traversal == CTENodeManager.TREE_TRAVERSAL_BFS:
-                        order_by_prefix = [ model._cte_node_depth,
-                            model._cte_node_ordering ]
-                    order_by = order_by_prefix
-                    if hasattr(model, '_cte_node_order_by') and \
-                        not model._cte_node_order_by is None and \
-                        len(model._cte_node_order_by) > 0:
-                        order_by.extend([field[0] if type(field) == tuple else \
-                            field for field in model._cte_node_order_by])
-                    # Specify the virtual fields for depth, path, and ordering;
-                    # optionally the offset Node constraint; and the desired
-                    # ordering. The CTE table will be added later by the
-                    # Compiler only if the actual query is a SELECT.
-                    query.add_extra(
-                        select = {
-                            model._cte_node_depth : model._cte_node_depth,
-                            model._cte_node_path : model._cte_node_path,
-                            model._cte_node_ordering : model._cte_node_ordering,
-                        },
-                        select_params = None,
-                        where = where,
-                        params = None,
-                        tables = None,          # Will be added by the Compiler.
-                        order_by = order_by,
-                    )
-            super(CTENodeManager.CTEQuerySet, self).__init__(model, query,
-                using)
-            
-    
     # SQL CTE temporary table name.
     DEFAULT_TABLE_NAME = 'cte'
     DEFAULT_CHILDREN_NAME = 'children'
@@ -474,7 +265,7 @@ class CTENodeManager(Manager):
         # The CTEQuerySet uses _cte_node_* attributes from the Model, so ensure
         # they exist.
         self._ensure_parameters()
-        return self.CTEQuerySet(self.model, using = self._db)
+        return CTEQuerySet(self.model, using = self._db)
     
     
     def roots(self):
@@ -576,7 +367,10 @@ class CTENodeManager(Manager):
         self._ensure_parameters()
         # This is implemented in the CTE WHERE logic, so we pass a reference to
         # the offset CTENode to the custom QuerySet, which will process it.
-        return self.CTEQuerySet(self.model, using = self._db, offset = node)
+        # Because the compiler will include the node in question in the offset,
+        # we must exclude it here.
+        return CTEQuerySet(self.model, using = self._db,
+            offset = node).exclude(pk = node.pk)
     
     
     def is_parent_of(self, node, subject):

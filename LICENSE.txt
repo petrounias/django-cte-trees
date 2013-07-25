@@ -1,4 +1,4 @@
-Copyright (c) 2001 Alexis Petrounias < www.petrounias.org >,
+Copyright (c) 2001 - 2013 Alexis Petrounias < www.petrounias.org >,
 all rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

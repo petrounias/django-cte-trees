@@ -3,7 +3,7 @@
 # This document is free and open-source software, subject to the OSI-approved
 # BSD license below.
 #
-# Copyright (c) 2011 Alexis Petrounias <www.petrounias.org>,
+# Copyright (c) 2011 - 2013 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""
+""" Setuptools for Django CTE Trees.
 """
 
 __status__ = "beta"
-__version__ = "1.0.0b"
+__version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
@@ -51,7 +51,7 @@ setup(
     maintainer = 'Alexis Petrounias <www.petrounias.org>',
     keywords = 'django, postgresql, cte, trees, sql',
     license = 'BSD',
-    description = 'Experimental implementation of Adjacency-List trees for Django using PostgreSQL Common Table Expressions (CTE).',
+    description = 'Django Adjacency-List trees using PostgreSQL Common Table Expressions (CTE).',
     url = 'http://www.petrounias.org/software/django-cte-trees/',
     download_url = "https://github.com/petrounias/django-cte-trees/archive/master.zip",
     classifiers = [

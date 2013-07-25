@@ -3,7 +3,7 @@
 # This document is free and open-source software, subject to the OSI-approved
 # BSD license below.
 #
-# Copyright (c) 2011 - 2013 Alexis Petrounias <www.petrounias.org>,
+# Copyright (c) 2013 Alexis Petrounias <www.petrounias.org>,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Sphinx configuration for Django CTE Trees.
+""" Django CTE Trees Fields.
 """
 
 __status__ = "beta"
@@ -39,49 +39,27 @@ __version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
-# Python
-import sys, os
+# Django
+from django.db.models import IntegerField, TextField
 
 
-# add package root as well as dummy Django application so models can be imported
-sys.path.append(os.path.abspath('../..'))
-os.environ['DJANGO_SETTINGS_MODULE'] = 'cte_tree_test.settings'
+class DepthField(IntegerField):
 
-extensions = ['sphinx.ext.autodoc']
+    def __init__(self):
+        super(DepthField, self).__init__(null = True, blank = True,
+            editable = False)
 
-templates_path = ['_templates']
 
-source_suffix = '.rst'
+class PathField(TextField):
 
-master_doc = 'index'
+    def __init__(self):
+        super(PathField, self).__init__(null = True, blank = True,
+            editable = False)
 
-project = u'Django CTE Trees'
-copyright = u'2011 - 2013 Alexis Petrounias <www.petrounias.org>'
 
-version = '1.0.0'
-release = '1.0.0b2'
+class OrderingField(TextField):
 
-pygments_style = 'sphinx'
+    def __init__(self):
+        super(OrderingField, self).__init__(null = True, blank = True,
+            editable = False)
 
-html_theme = 'default'
-
-html_static_path = ['_static']
-
-htmlhelp_basename = 'DjangoCTETreesdoc'
-
-latex_documents = [
-  ('index', 'DjangoCTETrees.tex', u'Django CTE Trees Documentation',
-   u'Alexis Petrounias \\textless{}www.petrounias.org\\textgreater{}', 'manual'),
-]
-
-man_pages = [
-    ('index', 'djangoctetrees', u'Django CTE Trees Documentation',
-     [u'Alexis Petrounias <www.petrounias.org>'], 1)
-]
-
-texinfo_documents = [
-  ('index', 'DjangoCTETrees', u'Django CTE Trees Documentation',
-   u'Alexis Petrounias <www.petrounias.org>', 'DjangoCTETrees',
-  'Experimental implementation of Adjacency-List trees for Django using PostgreSQL Common Table Expressions (CTE).',
-   'Miscellaneous'),
-]

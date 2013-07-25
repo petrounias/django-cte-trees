@@ -42,13 +42,36 @@ The custom query compiler generates the following SQL::
 
 where the variables are obtained from the CTE Node parameters.
 
-===================
+=====================
 Custom Query Compiler
-===================
+=====================
 
 The compiler constructs the ad hoc variables which will be used in the SELECT
 query, synthesizes the WHERE clause, as well as the order-by parameter, and then
-uses the Query's 'add_extra' method.
+uses the Query's 'add_extra' method. The table 'cte' is added, as well as an
+'ExtraWhere' node which ensures that the primary key of the 'cte' table matches
+the primary key of the model's table. If the CTE recursion is to be started from
+an offset Node, then an ExtraWhere is also added ensuring that all Nodes which
+are to be returned contain the primary key of the offset Node in their
+materialized 'path' virtual field (hence the offset Node is also included
+itself, which means descendant lookups must explicitly exclude it).
+
+In order to allow Django model fields and corresponding columns for the virtual
+fields 'depth', 'path', and 'ordering', appropriate prefixing is ensured for
+all queries involving the CTE compiler. So, for example, assuming the CTE Node
+model features an integer field 'order', specifying that ordering should be
+descending breadth first search (but ascending for siblings), you would write:
+
+ order_by('-depth', 'order')
+
+and the compiler would translate this to ['-"cte".depth', 'order'] because the
+'depth' field is provided by the CTE query but the 'order' field is provided by
+the SELECT query.
+
+PostgreSQL array type is used in order to materialize the 'path' and the
+'ordering' virtual fields; automatic casting is done by the compiler so primary
+keys and fields contributing to the order can be more 'exotic', such as a UUID
+primary key, converting VARCHAR to TEXT, and so on.
 
 ===========
 Performance
