@@ -6,7 +6,7 @@ aim is to completely hide the management of tree structure.
 
 Version 1.0.0 beta 2
 
-Documentation: http://django-cte-trees.readthedocs.com/
+Documentation: https://django-cte-trees.readthedocs.org/en/latest/
 
 Django Package: https://www.djangopackages.com/packages/p/django-cte-trees/
 
