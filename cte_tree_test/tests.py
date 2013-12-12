@@ -40,12 +40,13 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Python
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 # Django
 from django.test import TestCase
 from django.core.exceptions import ImproperlyConfigured, FieldError
+from django.db.models import F, Avg
 
 # Django CTE Trees
 from cte_tree_test.models import *
@@ -61,8 +62,19 @@ class SimpleNodeTest(TestCase):
         self.assertEqual(len(SimpleNode.objects.all()), 1)
         self.assertEqual(len(SimpleNode.objects.filter()), 1)
         self.assertEqual(SimpleNode.objects.count(), 1)
-        
-        
+
+
+    def test_node_creation_save(self):
+
+        node = SimpleNode()
+        node.save()
+
+        self.assertEqual(SimpleNode.objects.get().id, node.id)
+        self.assertEqual(len(SimpleNode.objects.all()), 1)
+        self.assertEqual(len(SimpleNode.objects.filter()), 1)
+        self.assertEqual(SimpleNode.objects.count(), 1)
+
+
     def test_multiple_node_creation(self):
         
         node_1 = SimpleNode.objects.create()
@@ -74,12 +86,14 @@ class SimpleNodeTest(TestCase):
         
     def test_node_save(self):
         
-        node = SimpleNode()
-        
+        node = SimpleNode.objects.create()
         node.save()
         
         self.assertEqual(node.id, SimpleNode.objects.get().id)
-        
+        self.assertEqual(len(SimpleNode.objects.all()), 1)
+        self.assertEqual(len(SimpleNode.objects.filter()), 1)
+        self.assertEqual(SimpleNode.objects.count(), 1)
+
     
     def test_node_delete(self):
         
@@ -89,7 +103,17 @@ class SimpleNodeTest(TestCase):
         
         self.assertEqual(len(SimpleNode.objects.filter()), 0)
         self.assertEqual(SimpleNode.objects.count(), 0)
-        
+
+
+    def test_node_delete_query(self):
+
+        node = SimpleNode.objects.create()
+
+        SimpleNode.objects.filter().delete()
+
+        self.assertEqual(len(SimpleNode.objects.filter()), 0)
+        self.assertEqual(SimpleNode.objects.count(), 0)
+
 
     def test_tree_structure(self):
         
@@ -791,7 +815,7 @@ class SimpleNamedNodeTest(TestCase):
     def test_node_creation(self):
         
         node = SimpleNamedNode.objects.create(name = 'root')
-        
+
         self.assertEqual(SimpleNamedNode.objects.get().name, node.name)
 
         
@@ -802,7 +826,16 @@ class SimpleNamedNodeTest(TestCase):
             name = 'root user')
         
         self.assertEqual(user.node.name, 'root')
-        
+
+
+    def test_node_save(self):
+
+        node = SimpleNamedNode.objects.create(name = 'amazing')
+        self.assertEqual(SimpleNamedNode.objects.get().name, 'amazing')
+        node.name = 'so and so'
+        node.save()
+        self.assertEqual(SimpleNamedNode.objects.get().name, 'so and so')
+
         
     def test_ordering(self):
         
@@ -1083,6 +1116,29 @@ class ExoticTypeNodeTest(TestCase):
         
         self.assertEqual(expected_order,
             [node.id for node in ExoticTypeNode.objects.all()])
+
+
+    def test_date_query(self):
+
+        node1 = ExoticTypeNode.objects.create(v = date(1982,9,26),
+            y = date(1982,9,29))
+        node2 = ExoticTypeNode.objects.create(v = date(1982,9,26),
+            y = date(1982,9,30))
+
+        self.assertEqual(list(ExoticTypeNode.objects.filter(
+            y__gt = F('v') + timedelta(days = 3))), [node2])
+
+        self.assertEqual(ExoticTypeNode.objects.filter(
+            y__gt = F('v') + timedelta(days = 3)).count(), 1)
+
+        self.assertEqual(ExoticTypeNode.objects.filter(
+            y__gte = F('v') + timedelta(days = 3)).count(), 2)
+
+        self.assertEqual(list(ExoticTypeNode.objects.filter(
+            y__lte = F('v') + timedelta(days = 3))), [node1])
+
+        self.assertEqual(list(ExoticTypeNode.objects.filter(
+            y__lte = F('v') + timedelta(days = -4))), [])
     
     
 class DBTypeNodeTest(TestCase):
@@ -1300,3 +1356,20 @@ class DBTypePrimaryKeyNodeTest(TestCase):
         self.assertFalse(fresh_root_node.is_descendant_of(fresh_root_node))
         self.assertFalse(fresh_middle_node.is_descendant_of(fresh_middle_node))
         self.assertFalse(fresh_bottom_node.is_descendant_of(fresh_bottom_node))
+
+
+class AggregationNodeTest(TestCase):
+
+    def test_aggregation(self):
+
+        node1 = AggregationNode.objects.create(price = 100)
+        node2 = AggregationNode.objects.create(price = 200)
+        node3 = AggregationNode.objects.create(price = 300)
+
+        self.assertEqual(
+            AggregationNode.objects.all().aggregate(Avg('price'))['price__avg'],
+            200)
+
+        self.assertEqual(list(AggregationNode.objects.filter(
+            price = AggregationNode.objects.all().aggregate(
+                Avg('price'))['price__avg'])), [node2])

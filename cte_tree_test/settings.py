@@ -39,6 +39,8 @@ __version__ = "1.0.0b2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
+DEBUG = True
+
 SECRET_KEY = 'dummy'
 
 INSTALLED_APPS = ('cte_tree', 'cte_tree_test', )

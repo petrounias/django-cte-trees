@@ -46,7 +46,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext as _
 
 # Django CTE Trees
-from query import CTEQuerySet
+from query import CTEQuerySet, CTEAggregateQuery
 
 
 class CTENodeManager(Manager):

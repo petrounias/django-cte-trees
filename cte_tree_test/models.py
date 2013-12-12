@@ -147,10 +147,12 @@ class TypeCombinationNode(CTENode, Model):
     
     _cte_node_order_by = [('v1', 'float'), 'v2']
     
-    
+
 class ExoticTypeNode(CTENode, Model):
     
     v = DateField()
+
+    y = DateField(null = True)
     
     _cte_node_order_by = ['v']
     
@@ -171,6 +173,11 @@ class DBTypePrimaryKeyNode(CTENode, Model):
     
     id = UUIDField(primary_key = True)
     
+
+class AggregationNode(CTENode, Model):
+
+    price = PositiveIntegerField()
+
 
 class BadParameter_parent_1_Node(CTENode, Model):
     

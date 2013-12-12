@@ -83,6 +83,22 @@ class CTEQuerySet(QuerySet):
         super(CTEQuerySet, self).__init__(model, query, using)
 
 
+    def aggregate(self, *args, **kwargs):
+        if self.query.distinct_fields:
+            raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
+        for arg in args:
+            kwargs[arg.default_alias] = arg
+
+        query = self.query.clone(CTEAggregateQuery)
+
+        for (alias, aggregate_expr) in kwargs.items():
+            query.add_aggregate(aggregate_expr, self.model, alias,
+                is_summary=True)
+
+        return query.get_aggregation(using=self.db)
+
+
+
 class CTEQuery(Query):
     """
     A Query which processes SQL compilation through the CTE Compiler, as well as
@@ -217,7 +233,7 @@ class CTEQuery(Query):
             DeleteQuery : CTEDeleteQuery,
             AggregateQuery : CTEAggregateQuery,
             DateQuery : CTEDateQuery,
-        }.get(klass, klass)
+        }.get(klass, self.__class__)
         return super(CTEQuery, self).clone(klass, memo, **kwargs)
 
 
@@ -416,6 +432,7 @@ class CTEInsertQueryCompiler(SQLInsertCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
+        print '; INSERT'
         return super(self.__class__, self).as_sql()
 
 
@@ -431,6 +448,7 @@ class CTEDeleteQueryCompiler(SQLDeleteCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
+        print '; DELETE'
         return super(self.__class__, self).as_sql()
 
 
@@ -449,6 +467,7 @@ class CTEAggregateQueryCompiler(SQLAggregateCompiler):
         """
         def _as_sql():
             return super(CTEAggregateQueryCompiler, self).as_sql(qn = qn)
+        print '; AGGREGATE'
         return CTECompiler.generate_sql(self.connection, self.query, _as_sql)
 
 
