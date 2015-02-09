@@ -33,6 +33,8 @@
 
 """ Django CTE Trees Query Compiler.
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 __status__ = "beta"
 __version__ = "1.0.0b2"
@@ -127,7 +129,7 @@ class CTEQuery(Query):
         """
         super(CTEQuery, self).__init__(model, where = where)
         # import from models here to avoid circular imports.
-        from models import CTENodeManager
+        from .models import CTENodeManager
         if not model is None:
             where = [self._generate_where(self)]
             # If an offset Node is specified, then only those Nodes which
@@ -183,7 +185,7 @@ class CTEQuery(Query):
     @classmethod
     def _generate_where(cls, query):
         def maybe_alias(table):
-            if query.table_map.has_key(table):
+            if table in query.table_map:
                 return query.table_map[table][0]
             return table
         return '{cte}."{pk}" = {table}."{pk}"'.format(
@@ -432,7 +434,7 @@ class CTEInsertQueryCompiler(SQLInsertCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
-        print '; INSERT'
+        print('; INSERT')
         return super(self.__class__, self).as_sql()
 
 
@@ -448,7 +450,7 @@ class CTEDeleteQueryCompiler(SQLDeleteCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
-        print '; DELETE'
+        print('; DELETE')
         return super(self.__class__, self).as_sql()
 
 
@@ -467,7 +469,7 @@ class CTEAggregateQueryCompiler(SQLAggregateCompiler):
         """
         def _as_sql():
             return super(CTEAggregateQueryCompiler, self).as_sql(qn = qn)
-        print '; AGGREGATE'
+        print('; AGGREGATE')
         return CTECompiler.generate_sql(self.connection, self.query, _as_sql)
 
 
