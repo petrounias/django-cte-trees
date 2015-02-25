@@ -36,8 +36,7 @@
 
 __status__ = "beta"
 __version__ = "1.0.0b2"
-__maintainer__ = (u"SJC", )
-__author__ = (u"SJC", )
+__maintainer__ = (u"David Hoffman", )
 
 # Setup tools
 from setuptools import setup, find_packages
@@ -47,8 +46,8 @@ setup(
     name = 'django-cte-trees-python3',
     version = ":versiontools:cte_tree:VERSION",
     packages = find_packages(),
-    author = 'SJC',
-    maintainer = 'SJC',
+    maintainer = 'David Hoffman',
+    maintainer_email = 'david.hoffman@stjoseph.com',
     keywords = 'django, postgresql, cte, trees, sql',
     license = 'BSD',
     description = 'Django Adjacency-List trees using PostgreSQL Common Table Expressions (CTE).',
