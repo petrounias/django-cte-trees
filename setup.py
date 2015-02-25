@@ -36,24 +36,24 @@
 
 __status__ = "beta"
 __version__ = "1.0.0b2"
-__maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
-__author__ = (u"Alexis Petrounias <www.petrounias.org>", )
+__maintainer__ = (u"SJC", )
+__author__ = (u"SJC", )
 
 # Setup tools
 from setuptools import setup, find_packages
 
  
 setup(
-    name = 'django-cte-trees',
+    name = 'django-cte-trees-python3',
     version = ":versiontools:cte_tree:VERSION",
     packages = find_packages(),
-    author = 'Alexis Petrounias <www.petrounias.org>',
-    maintainer = 'Alexis Petrounias <www.petrounias.org>',
+    author = 'SJC',
+    maintainer = 'SJC',
     keywords = 'django, postgresql, cte, trees, sql',
     license = 'BSD',
     description = 'Django Adjacency-List trees using PostgreSQL Common Table Expressions (CTE).',
-    url = 'http://www.petrounias.org/software/django-cte-trees/',
-    download_url = "https://github.com/petrounias/django-cte-trees/archive/master.zip",
+    url = 'https://github.com/stjosephcontent/django-cte-trees',
+    download_url = "https://github.com/stjosephcontent/django-cte-trees/archive/master.zip",
     classifiers = [
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',

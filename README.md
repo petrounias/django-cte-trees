@@ -1,3 +1,10 @@
+Note
+====
+
+This is a fork that introduces support for Python 3.
+
+The original work was done by Alexis Petrounias <www.petrounias.org>.
+
 Django CTE Trees
 ================
 
