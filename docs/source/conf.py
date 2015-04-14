@@ -35,7 +35,7 @@
 """
 
 __status__ = "beta"
-__version__ = "1.0.0b2"
+__version__ = "1.0.2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
@@ -58,8 +58,8 @@ master_doc = 'index'
 project = u'Django CTE Trees'
 copyright = u'2011 - 2013 Alexis Petrounias <www.petrounias.org>'
 
-version = '1.0.0'
-release = '1.0.0b2'
+version = '1.0.2'
+release = '1.0.2'
 
 pygments_style = 'sphinx'
 

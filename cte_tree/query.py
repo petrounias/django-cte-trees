@@ -37,7 +37,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 __status__ = "beta"
-__version__ = "1.0.0b2"
+__version__ = "1.0.2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 

@@ -34,8 +34,8 @@
 """ Setuptools for Django CTE Trees.
 """
 
-__status__ = "beta"
-__version__ = "1.0.0b2"
+__status__ = "alpha"
+__version__ = "1.0.2"
 __maintainer__ = (u"David Hoffman", )
 
 # Setup tools
