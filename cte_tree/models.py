@@ -33,6 +33,7 @@
 
 """ Django CTE Trees Models.
 """
+from __future__ import absolute_import
 
 __status__ = "beta"
 __version__ = "1.0.0b2"
@@ -46,7 +47,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext as _
 
 # Django CTE Trees
-from query import CTEQuerySet, CTEAggregateQuery
+from .query import CTEQuerySet
 
 
 class CTENodeManager(Manager):
