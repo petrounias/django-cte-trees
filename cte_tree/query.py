@@ -45,10 +45,10 @@ __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 from django.db import connections
 from django.db.models.query import QuerySet
 from django.db.models.sql import UpdateQuery, InsertQuery, DeleteQuery, \
-    AggregateQuery, DateQuery, RawQuery
+    AggregateQuery
 from django.db.models.sql.query import Query
 from django.db.models.sql.compiler import SQLCompiler, SQLUpdateCompiler, \
-    SQLInsertCompiler, SQLDeleteCompiler, SQLAggregateCompiler, SQLDateCompiler
+    SQLInsertCompiler, SQLDeleteCompiler, SQLAggregateCompiler
 from django.db.models.sql.where import ExtraWhere, WhereNode
 
 
@@ -59,7 +59,7 @@ class CTEQuerySet(QuerySet):
     WHERE clauses.
     """
 
-    def __init__(self, model = None, query = None, using = None, offset = None):
+    def __init__(self, model = None, query = None, using = None, offset = None, hints = None):
         """
         Prepares a CTEQuery object by adding appropriate extras, namely the
         SELECT virtual fields, the WHERE clause which matches the CTE pk with
@@ -220,7 +220,6 @@ class CTEQuery(Query):
             CTEInsertQuery : CTEInsertQueryCompiler,
             CTEDeleteQuery : CTEDeleteQueryCompiler,
             CTEAggregateQuery : CTEAggregateQueryCompiler,
-            CTEDateQuery : CTEDateQueryCompiler,
         }.get(self.__class__, CTEQueryCompiler)(self, connection, using)
 
     def clone(self, klass = None, memo = None, **kwargs):
@@ -234,7 +233,6 @@ class CTEQuery(Query):
             InsertQuery : CTEInsertQuery,
             DeleteQuery : CTEDeleteQuery,
             AggregateQuery : CTEAggregateQuery,
-            DateQuery : CTEDateQuery,
         }.get(klass, self.__class__)
         return super(CTEQuery, self).clone(klass, memo, **kwargs)
 
@@ -252,10 +250,6 @@ class CTEDeleteQuery(DeleteQuery, CTEQuery):
 
 
 class CTEAggregateQuery(AggregateQuery, CTEQuery):
-    pass
-
-
-class CTEDateQuery(DateQuery, CTEQuery):
     pass
 
 
@@ -471,8 +465,4 @@ class CTEAggregateQueryCompiler(SQLAggregateCompiler):
             return super(CTEAggregateQueryCompiler, self).as_sql(qn = qn)
         print('; AGGREGATE')
         return CTECompiler.generate_sql(self.connection, self.query, _as_sql)
-
-
-class CTEDateQueryCompiler(CTEQueryCompiler, SQLDateCompiler):
-    pass
 
