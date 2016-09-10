@@ -7,7 +7,7 @@ python:
 env:
 - REQ="Django>=1.8,<1.9"
 - REQ="Django>=1.9,<1.10"
-# - REQ="Django>=1.10,<1.11 django-mptt-nomagic"
+- REQ="Django>=1.10,<1.11"
 services:
 - postgresql
 install:
