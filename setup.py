@@ -41,7 +41,7 @@ __maintainer__ = (u"David Hoffman", )
 # Setup tools
 from setuptools import setup, find_packages
 
- 
+
 setup(
     name = 'django-cte-trees-python3',
     version = ":versiontools:cte_tree:VERSION",
@@ -64,5 +64,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     setup_requires = [ 'versiontools >= 1.3.1', ],
-    tests_require = [ 'Django >= 1.2', ],
+    tests_require = [ 'Django >= 1.8', ],
     zip_safe = True)
