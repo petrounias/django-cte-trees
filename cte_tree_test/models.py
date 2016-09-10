@@ -39,6 +39,8 @@ __version__ = "1.0.2"
 __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
+from uuid import uuid4
+
 # Django
 from django.db.models import Model, ForeignKey, CharField, FloatField, \
     PositiveIntegerField, DateField, UUIDField, CASCADE
@@ -158,7 +160,7 @@ class ExoticTypeNode(CTENode, Model):
 
 class DBTypeNode(CTENode, Model):
 
-    v = UUIDField()
+    v = UUIDField(default=uuid4)
 
     _cte_node_order_by = ['v']
 
@@ -170,7 +172,7 @@ class CustomPrimaryKeyNode(CTENode, Model):
 
 class DBTypePrimaryKeyNode(CTENode, Model):
 
-    id = UUIDField(primary_key = True)
+    id = UUIDField(primary_key = True, default=uuid4)
 
 
 class AggregationNode(CTENode, Model):
