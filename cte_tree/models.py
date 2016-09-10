@@ -185,8 +185,8 @@ class CTENodeManager(Manager):
                       'relation.'))
 
         try:
-            parent_field = self.model._meta.get_field_by_name(
-                self.model._cte_node_parent)[0]
+            parent_field = self.model._meta.get_field(
+                self.model._cte_node_parent)
         except FieldDoesNotExist:
             raise ImproperlyConfigured(''.join([
                 _('CTENode._cte_node_parent must specify a Foreign Key to self, '
@@ -202,8 +202,8 @@ class CTENodeManager(Manager):
 
         # Record the parent field attribute name for future reference.
         setattr(self.model, '_cte_node_parent_attname',
-            self.model._meta.get_field_by_name(
-                self.model._cte_node_parent)[0].attname)
+            self.model._meta.get_field(
+                self.model._cte_node_parent).attname)
 
         # Ensure traversal choice is valid.
         traversal_choices = [choice[0] for choice in \

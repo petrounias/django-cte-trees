@@ -343,7 +343,7 @@ class CTECompiler(object):
                     name = field[0]
                 else:
                     name = field
-                _field = query.model._meta.get_field_by_name(name)[0]
+                _field = query.model._meta.get_field(name)
                 if _field.db_type(connection).startswith('varchar'):
                     return 'CAST (T."%s" AS TEXT)' % name
                 else:
