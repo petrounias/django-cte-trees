@@ -84,21 +84,33 @@ class CTEQuerySet(QuerySet):
             query = CTEQuery(model, offset = offset)
         super(CTEQuerySet, self).__init__(model, query, using)
 
-
     def aggregate(self, *args, **kwargs):
+        """
+        Returns a dictionary containing the calculations (aggregation)
+        over the current queryset
+
+        If args is present the expression is passed as a kwarg using
+        the Aggregate object's default alias.
+        """
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
         for arg in args:
+            # The default_alias property may raise a TypeError, so we use
+            # a try/except construct rather than hasattr in order to remain
+            # consistent between PY2 and PY3 (hasattr would swallow
+            # the TypeError on PY2).
+            try:
+                arg.default_alias
+            except (AttributeError, TypeError):
+                raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
         query = self.query.clone(CTEAggregateQuery)
-
         for (alias, aggregate_expr) in kwargs.items():
-            query.add_aggregate(aggregate_expr, self.model, alias,
-                is_summary=True)
-
-        return query.get_aggregation(using=self.db)
-
+            query.add_annotation(aggregate_expr, alias, is_summary=True)
+            if not query.annotations[alias].contains_aggregate:
+                raise TypeError("%s is not an aggregate expression" % alias)
+        return query.get_aggregation(self.db, kwargs.keys())
 
 
 class CTEQuery(Query):
@@ -381,7 +393,7 @@ class CTECompiler(object):
 
 class CTEQueryCompiler(SQLCompiler):
 
-    def as_sql(self, with_limits = True, with_col_aliases = False):
+    def as_sql(self, *args, **kwargs):
         """
         Overrides the :class:`SQLCompiler` method in order to prepend the
         necessary CTE syntax, as well as perform pre- and post-processing,
@@ -395,15 +407,13 @@ class CTEQueryCompiler(SQLCompiler):
         :rtype:
         """
         def _as_sql():
-            return super(CTEQueryCompiler, self).as_sql(
-                with_limits = with_limits,
-                with_col_aliases = with_col_aliases)
+            return super(CTEQueryCompiler, self).as_sql(*args, **kwargs)
         return CTECompiler.generate_sql(self.connection, self.query, _as_sql)
 
 
 class CTEUpdateQueryCompiler(SQLUpdateCompiler):
 
-    def as_sql(self):
+    def as_sql(self, *args, **kwargs):
         """
         Overrides the :class:`SQLUpdateCompiler` method in order to remove any
         CTE-related WHERE clauses, which are not necessary for UPDATE queries,
@@ -413,12 +423,12 @@ class CTEUpdateQueryCompiler(SQLUpdateCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
-        return super(self.__class__, self).as_sql()
+        return super(self.__class__, self).as_sql(*args, **kwargs)
 
 
 class CTEInsertQueryCompiler(SQLInsertCompiler):
 
-    def as_sql(self):
+    def as_sql(self, *args, **kwargs):
         """
         Overrides the :class:`SQLInsertCompiler` method in order to remove any
         CTE-related WHERE clauses, which are not necessary for INSERT queries,
@@ -428,13 +438,12 @@ class CTEInsertQueryCompiler(SQLInsertCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
-        print('; INSERT')
-        return super(self.__class__, self).as_sql()
+        return super(self.__class__, self).as_sql(*args, **kwargs)
 
 
 class CTEDeleteQueryCompiler(SQLDeleteCompiler):
 
-    def as_sql(self):
+    def as_sql(self, *args, **kwargs):
         """
         Overrides the :class:`SQLDeleteCompiler` method in order to remove any
         CTE-related WHERE clauses, which are not necessary for DELETE queries,
@@ -444,13 +453,12 @@ class CTEDeleteQueryCompiler(SQLDeleteCompiler):
         :rtype:
         """
         CTEQuery._remove_cte_where(self.query)
-        print('; DELETE')
-        return super(self.__class__, self).as_sql()
+        return super(self.__class__, self).as_sql(*args, **kwargs)
 
 
 class CTEAggregateQueryCompiler(SQLAggregateCompiler):
 
-    def as_sql(self, qn = None):
+    def as_sql(self, *args, **kwargs):
         """
         Overrides the :class:`SQLAggregateCompiler` method in order to
         prepend the necessary CTE syntax, as well as perform pre- and post-
@@ -462,7 +470,5 @@ class CTEAggregateQueryCompiler(SQLAggregateCompiler):
         :rtype:
         """
         def _as_sql():
-            return super(CTEAggregateQueryCompiler, self).as_sql(qn = qn)
-        print('; AGGREGATE')
+            return super(CTEAggregateQueryCompiler, self).as_sql(*args, **kwargs)
         return CTECompiler.generate_sql(self.connection, self.query, _as_sql)
-
