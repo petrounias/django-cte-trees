@@ -1,3 +1,2 @@
-Django>=1.6
-future>=0.14.3
-psycopg2==2.5
+Django>=1.8
+psycopg2==2.6.2

@@ -41,11 +41,10 @@ __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
 from django.db.models import Model, ForeignKey, CharField, FloatField, \
-    PositiveIntegerField, DateField, CASCADE
+    PositiveIntegerField, DateField, UUIDField, CASCADE
 
 # Django CTE Trees
 from cte_tree.models import CTENode, CTENodeManager
-from cte_tree_test.fields import UUIDField
 
 
 class SimpleNode(CTENode, Model):
