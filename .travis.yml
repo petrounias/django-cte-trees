@@ -1,0 +1,15 @@
+language: python
+sudo: false
+cache: pip
+python:
+- '2.7'
+- '3.4'
+env:
+- REQ="Django>=1.8,<1.9"
+# - REQ="Django>=1.10,<1.11 django-mptt-nomagic"
+services:
+- postgresql
+install:
+- pip install -U pip wheel
+- pip install $REQ psycopg2 pytz
+script: PYTHONWARNINGS=all PYTHONPATH=. ./cte_tree_test/manage.py test
