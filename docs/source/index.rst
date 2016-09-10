@@ -70,9 +70,9 @@ Prerequisites
 Core:
 
 - PostgreSQL >= 8.4
-- Python >= 2.4
+- Python >= 2.7, >= 3.4
 - psycopg2 >= 2.4
-- Django >= 1.2
+- Django >= 1.8
 
 
 =========
