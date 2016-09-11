@@ -455,9 +455,9 @@ class CTENodeManager(Manager):
 
         # The path will either be an index of primitives, or an encoding of an
         # array.
-        if type(node.path) == list:
+        if type(getattr(node, node._cte_node_path)) == list:
             # We can slice with -1 because we know that depth > 1 from above.
-            return node.id in subject.path[0:-1]
+            return node.id in getattr(subject, subject._cte_node_path)[0:-1]
         else:
             # Search for node id up to the penultimate entry in the path of the
             # subject, meaning we ignore the end of the path consisting of:
@@ -466,7 +466,7 @@ class CTENodeManager(Manager):
             # c) the separator character,
             # therefore we look for a match ending at the length of the
             # subject's id string plus two (so negative index length minus two).
-            return subject.path[:-len(str(subject.id)) - 2].index(
+            return getattr(subject, subject._cte_node_path)[:-len(str(subject.id)) - 2].index(
                 str(node.id)) > 0
 
 
@@ -499,9 +499,9 @@ class CTENodeManager(Manager):
 
         # The path will either be an index of primitives, or an encoding of an
         # array.
-        if type(node.path) == list:
+        if type(getattr(node, node._cte_node_path)) == list:
             # We can slice with -1 because we know that depth > 1 from above.
-            return subject.id in node.path[0:-1]
+            return subject.id in getattr(node, node._cte_node_path)[0:-1]
         else:
             # Search for subject id up to the penultimate entry in the path of
             # the node, meaning we ignore the end of the path consisting of:
@@ -510,7 +510,7 @@ class CTENodeManager(Manager):
             # c) the separator character,
             # therefore we look for a match ending at most at the length of the
             # node's id string plus two (so negative index length minus two).
-            return node.path[:-len(str(node.id)) - 2].index(str(subject.id)) > 0
+            return getattr(node, node._cte_node_path)[:-len(str(node.id)) - 2].index(str(subject.id)) > 0
 
 
     def is_leaf(self, node):
@@ -649,7 +649,7 @@ class CTENodeManager(Manager):
         """
         return {
             'depth' : node.depth,
-            'path' : [str(c) for c in node.path],
+            'path' : [str(c) for c in getattr(node, node._cte_node_path)],
             'ordering' : node.ordering,
             'leaf' : node.is_leaf(),
             'branch' : node.is_branch(),
