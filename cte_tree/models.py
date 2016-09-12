@@ -42,7 +42,7 @@ __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
 from django.core.exceptions import ImproperlyConfigured, FieldError
-from django.db.models import Model, Manager, ForeignKey
+from django.db.models import Model, Manager, ForeignKey, CASCADE
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext as _
 
@@ -1035,7 +1035,7 @@ class CTENode(Model):
     # This ForeignKey is mandatory, however, its name can be different, as long
     # as it's specified through _cte_node_parent.
     _cte_node_parent = 'parent'
-    parent = ForeignKey('self', null = True, blank = True,
+    parent = ForeignKey('self', on_delete=CASCADE, null = True, blank = True,
         related_name = 'children')
 
     # This custom Manager is mandatory.
