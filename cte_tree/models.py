@@ -1034,6 +1034,7 @@ class CTENode(Model):
 
     # This ForeignKey is mandatory, however, its name can be different, as long
     # as it's specified through _cte_node_parent.
+    _cte_node_parent = 'parent'
     parent = ForeignKey('self', null = True, blank = True,
         related_name = 'children')
 
