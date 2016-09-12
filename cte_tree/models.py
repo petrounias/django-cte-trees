@@ -450,7 +450,7 @@ class CTENodeManager(Manager):
             return False
 
         # Optimization: a node will never be an ancestor of a root node.
-        if subject.depth == 1:
+        if getattr(subject, subject._cte_node_depth) == 1:
             return False
 
         # The path will either be an index of primitives, or an encoding of an
@@ -494,7 +494,7 @@ class CTENodeManager(Manager):
             return False
 
         # Optimization: a root node will never be a descendant of any node.
-        if node.depth == 1:
+        if getattr(node, node._cte_node_depth) == 1:
             return False
 
         # The path will either be an index of primitives, or an encoding of an
@@ -648,9 +648,9 @@ class CTENodeManager(Manager):
         :return: a dictionary representation of the structure of the node.
         """
         return {
-            'depth' : node.depth,
+            'depth' : getattr(node, node._cte_node_depth),
             'path' : [str(c) for c in getattr(node, node._cte_node_path)],
-            'ordering' : node.ordering,
+            'ordering' : getattr(node, node._cte_node_ordering),
             'leaf' : node.is_leaf(),
             'branch' : node.is_branch(),
             'node' : node,
