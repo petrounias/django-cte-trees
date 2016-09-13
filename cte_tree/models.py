@@ -41,7 +41,8 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
-from django.core.exceptions import ImproperlyConfigured, FieldError
+from django.core.exceptions import (
+    ImproperlyConfigured, FieldError, ValidationError)
 from django.db.models import Model, Manager, ForeignKey, CASCADE
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.translation import ugettext as _
@@ -1040,6 +1041,15 @@ class CTENode(Model):
 
     # This custom Manager is mandatory.
     objects = CTENodeManager()
+
+
+    def clean(self):
+        """ Prevents cycles in the tree. """
+        super(CTENode, self).clean()
+        if self.parent and self.pk in getattr(self.parent, self._cte_node_path):
+            raise ValidationError(_(
+                'A node cannot be made a descendant of itself.'
+            ))
 
 
     def root(self):
