@@ -41,6 +41,7 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
+from django import VERSION as DJANGO_VERSION
 from django.core.exceptions import (
     ImproperlyConfigured, FieldError, ValidationError)
 from django.db.models import Model, Manager, ForeignKey, CASCADE
@@ -177,7 +178,7 @@ class CTENodeManager(Manager):
             found = False
             for f in self.model._meta.fields:
                 if isinstance(f, ForeignKey):
-                    if f.rel.to == self.model:
+                    if _get_remote_model(f) == self.model:
                         setattr(self.model, '_cte_node_parent', f.name)
                         found = True
             if not found:
@@ -195,7 +196,7 @@ class CTENodeManager(Manager):
                 self.model._cte_node_parent]))
 
         # Ensure parent relation is a Foreign Key to self.
-        if not parent_field.rel.to == self.model:
+        if not _get_remote_model(parent_field) == self.model:
             raise ImproperlyConfigured(''.join([
                 _('CTENode._cte_node_parent must specify a Foreign Key to self, '
                   'instead it is: '),
@@ -1285,3 +1286,9 @@ class CTENode(Model):
         # Prevent cycles in order to maintain tree / forest property.
         unique_together = [('id', 'parent'), ]
 
+if DJANGO_VERSION >= (1, 10):
+    CTENode._meta.base_manager_name = 'objects'
+
+
+def _get_remote_model(field):
+    return field.rel.to if DJANGO_VERSION < (1, 9) else field.remote_field.model

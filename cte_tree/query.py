@@ -42,6 +42,7 @@ __maintainer__ = (u"Alexis Petrounias <www.petrounias.org>", )
 __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 
 # Django
+from django import VERSION as DJANGO_VERSION
 from django.db import connections
 from django.db.models.query import QuerySet
 from django.db.models.sql import UpdateQuery, InsertQuery, DeleteQuery, \
@@ -224,8 +225,12 @@ class CTEQuery(Query):
         if using:
             connection = connections[using]
         # Check that the compiler will be able to execute the query
+        if DJANGO_VERSION < (1, 9):
+            check = connection.ops.check_aggregate_support
+        else:
+            check = connection.ops.check_expression_support
         for alias, aggregate in self.annotation_select.items():
-            connection.ops.check_aggregate_support(aggregate)
+            check(aggregate)
         # Instantiate the custom compiler.
         return {
             CTEUpdateQuery : CTEUpdateQueryCompiler,
@@ -240,13 +245,24 @@ class CTEQuery(Query):
             methods such as 'update' and '_update' in order to generate UPDATE
             queries rather than SELECT queries.
         """
+        if DJANGO_VERSION < (2, 0):
+            klass = {
+                UpdateQuery : CTEUpdateQuery,
+                InsertQuery : CTEInsertQuery,
+                DeleteQuery : CTEDeleteQuery,
+                AggregateQuery : CTEAggregateQuery,
+            }.get(klass, self.__class__)
+            return super(CTEQuery, self).clone(klass, memo, **kwargs)
+        return super(CTEQuery, self).clone()
+
+    def chain(self, klass=None):
         klass = {
             UpdateQuery : CTEUpdateQuery,
             InsertQuery : CTEInsertQuery,
             DeleteQuery : CTEDeleteQuery,
             AggregateQuery : CTEAggregateQuery,
         }.get(klass, self.__class__)
-        return super(CTEQuery, self).clone(klass, memo, **kwargs)
+        return super(CTEQuery, self).chain(klass)
 
 
 class CTEUpdateQuery(UpdateQuery, CTEQuery):

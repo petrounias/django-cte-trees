@@ -42,6 +42,7 @@ __author__ = (u"Alexis Petrounias <www.petrounias.org>", )
 from uuid import uuid4
 
 # Django
+from django import VERSION as DJANGO_VERSION
 from django.db.models import Model, ForeignKey, CharField, FloatField, \
     PositiveIntegerField, DateField, UUIDField, CASCADE
 
@@ -213,6 +214,10 @@ class BadParameter_parent_3_Node(CTENode, Model):
 class BadParameter_parent_4_Node(Model):
 
     objects = CTENodeManager()
+
+
+if DJANGO_VERSION >= (1, 10):
+    BadParameter_parent_4_Node._meta.base_manager_name = 'objects'
 
 
 class BadParameter_traversal_Node(CTENode, Model):
