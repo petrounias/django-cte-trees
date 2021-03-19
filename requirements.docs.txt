@@ -1,6 +1,6 @@
 -r requirements.txt
 
-Jinja2==2.7
+Jinja2==2.11.3
 MarkupSafe==0.18
 Pygments==1.6
 Sphinx==1.2b1
